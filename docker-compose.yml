@@ -1,0 +1,36 @@
+version : '3.5'
+
+services:
+  docker-mysql:
+    container_name: docker-mysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+      MYSQL_DATABASE: financial_records
+    networks:
+      - app_network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  app:
+    container_name: financial-app
+    image: java-app:1.0
+    ports:
+      - 8080:8080
+    depends_on:
+      - docker-mysql
+    networks:
+      - app_network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://docker-mysql:3306/financial_records
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: user
+
+networks:
+  app_network:
+    name: app_network
+
+volumes:
+  mysql_data:
